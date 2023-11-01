@@ -11,21 +11,6 @@ startup()
     python3 dbUpdateSentimentPlot.py
 }
 
-#update database every 120 minutes
-# update_db()
-# {
-#     sleep 10
-#     while true; do
-#         echo "Waiting 120 minutes..."
-#         #Wait 120 minutes before updating the database
-#         sleep 7200
-        
-#         python3 dbPopulateTwitter.py
-#         python3 dbPopulateReddit.py
-#         python3 dbUpdateSentimentPlot.py
-#     done
-# }
-
 #fork new child processes for startup and update_db functions
 # startup &
 # update_db &
