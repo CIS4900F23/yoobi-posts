@@ -18,10 +18,17 @@ class DBConnect:
     REDDIT : str = "reddit_posts"
     
     def __init__(self) -> None:
-        if test_db == '1':
-            self.client = mongomock.MongoClient()
-        else:
+        # if test_db == '1':
+        #     self.client = mongomock.MongoClient()
+        # else:
+        #     self.client = MongoClient(mongo_uri)
+        try:
             self.client = MongoClient(mongo_uri)
+            # The ismaster command is cheap and does not require auth.
+            self.client.admin.command('ismaster')
+            print("MongoDB connection successful.")
+        except ConnectionFailure:
+            print("MongoDB connection failed.")
 
     def getDatabaseNames(self) -> List[str]:
         return self.client.list_database_names()
