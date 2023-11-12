@@ -8,7 +8,7 @@ from pymongo import MongoClient
 from profanity_filter import ProfanityFilter
 
 # mongo_uri = 'mongodb://' + os.environ.get('MONGO_USERNAME') + ':' + os.environ.get('MONGO_PASSWORD') + '@' + os.environ.get('MONGO_HOSTNAME') + ':27017'
-mongo_uri = "mongodb://mongodb-service.default.svc.cluster.local:27017/"
+mongo_uri = "mongodb://yoobi-db.default.svc.cluster.local:27017/"
 test_db = os.environ.get('DB_TEST')
 
 class DBConnect:
