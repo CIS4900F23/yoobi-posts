@@ -1,31 +1,30 @@
-import os
 import json
 import re
 from typing import List
-import mongomock
 from nltk.corpus import stopwords
 from pymongo import MongoClient
 from profanity_filter import ProfanityFilter
 from pymongo.errors import ConnectionFailure
 
 # mongo_uri = 'mongodb://' + os.environ.get('MONGO_USERNAME') + ':' + os.environ.get('MONGO_PASSWORD') + '@' + os.environ.get('MONGO_HOSTNAME') + ':27017'
-mongo_uri = "mongodb://yoobi-db.development.svc.cluster.local:27017/"
-# test_db = os.environ.get('DB_TEST')
+# mongo_uri = "mongodb://root:example@yoobi-db:27017/"
+# mongo_uri = "mongodb://yoobi-db.development.svc.cluster.local:27017/"
+
+mongo_urI = "mongodb://root:example@yoobi-db.development.svc.cluster.local:27017"
+
+
+
 
 class DBConnect:
-    DB : str = "UBI"
-    TWITTER : str = "tweets"
-    REDDIT : str = "reddit_posts"
-    
+    DB: str = "UBI"
+    TWITTER: str = "tweets"
+    REDDIT: str = "reddit_posts"
+
     def __init__(self) -> None:
-        # if test_db == '1':
-        #     self.client = mongomock.MongoClient()
-        # else:
-        #     self.client = MongoClient(mongo_uri)
         try:
             self.client = MongoClient(mongo_uri)
             # The ismaster command is cheap and does not require auth.
-            self.client.admin.command('ismaster')
+            self.client.admin.command("ismaster")
             print("MongoDB connection successful.")
         except ConnectionFailure:
             print("MongoDB connection failed.")
@@ -42,41 +41,47 @@ class DBConnect:
         cl = db[collection]
 
         return cl.estimated_document_count()
-    
+
     def getRandomDocument(self, database: str, collection: str) -> dict:
         """Returns a random document from the collection"""
         db = self.client[database]
         cl = db[collection]
-        doc = list(cl.aggregate([{"$sample" : { "size" : 1}}]))
+        doc = list(cl.aggregate([{"$sample": {"size": 1}}]))
 
         # Check if the random sampler failed. Perhaps the collection does not exist, for example.
         if len(doc) == 0:
-            return {"_id": "abc123",
-                    "created_at" : "01-01-1900",
-                    "content" : "The random sampler failed!",
+            return {
+                "_id": "abc123",
+                "created_at": "01-01-1900",
+                "content": "The random sampler failed!",
             }
 
         return doc[0]
 
-    def writeFileToCollection(self, database: str, collection: str, filename: str) -> None:
+    def writeFileToCollection(
+        self, database: str, collection: str, filename: str
+    ) -> None:
         with open(filename, "r", encoding="UTF-8") as file:
             obj = json.load(file)
             data = obj["data"]
             db = self.client[database]
-            cl = db[collection]  
-            cl.insert_many(data, ordered=False)   
+            cl = db[collection]
+            cl.insert_many(data, ordered=False)
 
-    def writeJSONToCollection(self, database:str, collection: str, jsonObject: object) -> None:
-        #print(jsonObject)
+    def writeJSONToCollection(
+        self, database: str, collection: str, jsonObject: object
+    ) -> None:
+        # print(jsonObject)
         obj = json.loads(jsonObject)
         data = obj["data"]
-        #print(data)
+        # print(data)
         db = self.client[database]
-        cl = db[collection] 
-        cl.insert_many(data,ordered=False)
+        cl = db[collection]
+        cl.insert_many(data, ordered=False)
 
-
-    def writeCollectionToFile(self, database: str, collection: str, filename: str) -> None:
+    def writeCollectionToFile(
+        self, database: str, collection: str, filename: str
+    ) -> None:
         db = self.client[database]
         cl = db[collection]
         docs = list(cl.find({}))
@@ -91,7 +96,6 @@ class DBConnect:
         db = self.client[database]
         cl = db[collection]
         cl.drop()
-
 
     def getCollection(self, database: str, collection: str) -> str:
         db = self.client[database]
@@ -108,23 +112,25 @@ class DBConnect:
         col = db[collection]
 
         for document in col.find({}):
-            col.update_one(document, {"$set": {"content" : pf.censor(document["content"])}})
+            col.update_one(
+                document, {"$set": {"content": pf.censor(document["content"])}}
+            )
 
     def getDocumentById(self, database: str, collection: str, doc_id: str) -> dict:
         """Returns a document from the collection by querying for an id"""
         db = self.client[database]
         cl = db[collection]
-        result = cl.find_one( { "_id": doc_id } ) 
-        
+        result = cl.find_one({"_id": doc_id})
+
         return result
-    
+
     def cleanCollection(self, database: str, collection: str) -> None:
         db = self.client[database]
         cl = db[collection]
 
         for document in cl.find({}):
             result = document["content"]
-            
+
             # Remove mentions
             result = re.sub("@([a-zA-Z0-9_]{1,50})", "", result)
             # Remove hashtags
@@ -135,12 +141,16 @@ class DBConnect:
             result = re.sub("\n", "", result)
 
             # Remove stop words
-            tokens = [word for word in result.split() if word.lower() not in stopwords.words('english')]
+            tokens = [
+                word
+                for word in result.split()
+                if word.lower() not in stopwords.words("english")
+            ]
             result = " ".join(tokens)
 
-            cl.update_one(document, {"$set": {"content" : result}})
+            cl.update_one(document, {"$set": {"content": result}})
 
-    def cleanString(self, content : str) -> str:
+    def cleanString(self, content: str) -> str:
         # Copy parameter.
         result = content
         # Remove mentions
@@ -152,11 +162,15 @@ class DBConnect:
         # Remove newlines
         result = re.sub("\n", "", result)
         # Remove stop words
-        tokens = [word for word in result.split() if word.lower() not in stopwords.words('english')]
+        tokens = [
+            word
+            for word in result.split()
+            if word.lower() not in stopwords.words("english")
+        ]
         # Concatenate tokens.
         result = " ".join(tokens)
 
         return result
-    
+
     def closeConnection(self) -> None:
         self.client.close()
