@@ -6,13 +6,11 @@ from pymongo import MongoClient
 from profanity_filter import ProfanityFilter
 from pymongo.errors import ConnectionFailure
 
-# mongo_uri = 'mongodb://' + os.environ.get('MONGO_USERNAME') + ':' + os.environ.get('MONGO_PASSWORD') + '@' + os.environ.get('MONGO_HOSTNAME') + ':27017'
+# For Docker Compose
 # mongo_uri = "mongodb://root:example@yoobi-db:27017/"
-# mongo_uri = "mongodb://yoobi-db.development.svc.cluster.local:27017/"
 
+# For K8s
 mongo_urI = "mongodb://root:example@yoobi-db.development.svc.cluster.local:27017"
-
-
 
 
 class DBConnect:
