@@ -10,7 +10,7 @@ from pymongo.errors import ConnectionFailure
 # mongo_uri = "mongodb://root:example@yoobi-db:27017/"
 
 # For K8s
-mongo_urI = "mongodb://root:example@yoobi-db.development.svc.cluster.local:27017"
+mongo_uri = "mongodb://yoobi-db.development.svc.cluster.local:27017"
 
 
 class DBConnect:
