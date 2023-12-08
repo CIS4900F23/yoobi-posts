@@ -7,10 +7,10 @@ from profanity_filter import ProfanityFilter
 from pymongo.errors import ConnectionFailure
 
 # For Docker Compose
-# mongo_uri = "mongodb://root:example@yoobi-db:27017/"
+ # mongo_uri = "mongodb://root:example@yoobi-db:27017/"
 
 # For K8s
-mongo_uri = "mongodb://yoobi-db.development.svc.cluster.local:27017"
+mongo_uri = "mongodb://yoobi-db.production.svc.cluster.local:27017"
 
 
 class DBConnect:

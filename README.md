@@ -1,0 +1,1 @@
+You MUST change the connection string in connect.py!
